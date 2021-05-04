@@ -98,3 +98,78 @@ on s.executive_id = p.executive_id
 where p.networth > 50000
 
 -------------EJERCICIO 2
+
+
+create table product (
+	id int primary key,
+	model varchar(50),
+	maker varchar(50),
+	type varchar(50)
+) ;
+create table pc (
+	id int primary key,
+	model varchar(50),
+	speed float,
+	ram float,
+	hd float,
+	price float
+
+) ;
+
+
+insert into pc values
+(1,'Model 1',3000,8000,1024,3000),
+(2,'Model 2',3000,8000,516,1600),
+(3,'Model 3',3000,8000,516,1800),
+(4,'Model 4',2500,16000,1024,2500),
+(5,'Model 5',2500,8000,1024,2500),
+(6,'Model 6',2500,8000,1024,4000) ;
+
+insert into product values
+(1,'Model 1','Maker 1' , 'PC'),
+(2,'Model 2','Maker 3','PRINTER'),
+(3,'Model 3','Maker 3','LAPTOP'),
+(4,'Model 4','Maker 4','LAPTOP'),
+(5,'Model 5','Maker 2','PC'),
+(6,'Model 6','Maker 2','PC') ;
+
+create view newpc as select maker, pc.model, speed, ram, hd, price
+	from product, pc
+	where product.model = pc.model and type = 'pc';
+
+
+------PREGUNTA 1:
+--- No, cambios en esta vista no resultarian en cambios en las tbalas base.
+
+
+
+--PREGUNTA 2: 
+drop trigger t_insert_into_pc_too on newpc ;
+
+CREATE OR REPLACE FUNCTION insert_into_pc_too()
+RETURNS TRIGGER
+LANGUAGE PLPGSQL AS $$
+declare latest numeric;
+BEGIN
+	select id into latest from pc order by id desc limit 1;
+    insert into pc values (latest+1,new.model,new.speed,new.ram,new.hd,new.price);
+	insert into product values (latest+1, new.model , new.maker, 'pc');
+    RETURN NEW;
+END;
+$$
+;
+
+
+CREATE TRIGGER t_insert_into_pc_too
+INSTEAD OF INSERT ON newpc
+FOR EACH ROW
+EXECUTE PROCEDURE insert_into_pc_too();
+
+
+insert into newpc (maker,model,speed,ram,hd,price)values('maker 1','new model',3500,8000,1024,1555) ;
+
+----pregunta 3:
+
+
+
+
