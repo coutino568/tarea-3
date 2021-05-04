@@ -172,4 +172,46 @@ insert into newpc (maker,model,speed,ram,hd,price)values('maker 1','new model',3
 
 
 
+drop trigger t_update_into_pc_too on newpc ;
 
+CREATE OR REPLACE FUNCTION update_into_pc_too()
+RETURNS TRIGGER
+LANGUAGE PLPGSQL AS $$
+
+BEGIN
+	UPDATE pc SET price = new.price WHERE model= new.model;
+	RETURN NEW;
+END;
+$$
+;
+
+
+CREATE TRIGGER t_update_into_pc_too
+INSTEAD OF update ON newpc
+FOR EACH ROW
+EXECUTE PROCEDURE update_into_pc_too();
+
+
+
+------ pregunta 4
+
+
+drop trigger t_delete_from_pc_too on newpc ;
+
+CREATE OR REPLACE FUNCTION t_delete_from_pc_too()
+RETURNS TRIGGER
+LANGUAGE PLPGSQL AS $$
+
+BEGIN
+	delete from pc WHERE model=old.model;
+	delete from product WHERE model=old.model;
+	RETURN NEW;
+END;
+$$
+;
+
+
+CREATE TRIGGER t_delete_from_pc_too
+INSTEAD OF delete ON newpc
+FOR EACH ROW
+EXECUTE PROCEDURE t_delete_from_pc_too();
