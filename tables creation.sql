@@ -79,3 +79,22 @@ select executive_id, id as movieStar_ID, m.name , m.address, networth,birthdate,
 	on s.president_executive_id = e.executive_id ) sub1
 join movieStar m
 on m.name = sub1.name
+
+-------------
+----parte ii
+
+--pregunta 1 :
+select sub1.name from (
+	select * from movieexec e 
+	where networth>10000) sub1
+join ExecutiveStar s
+on s.executive_id = sub1.executive_id
+
+-- pregunta 2 :
+
+select p.name from StudioPress p
+join executiveStar s
+on s.executive_id = p.executive_id
+where p.networth > 50000
+
+-------------EJERCICIO 2
